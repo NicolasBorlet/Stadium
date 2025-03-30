@@ -14,10 +14,9 @@
     },
     "newArchEnabled": true,
     "jsEngine": "hermes",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
+      "googleServicesFile": "./google-services.json",
       "icon": "./assets/images/app-icon-android-legacy.png",
       "package": "com.stadium",
       "adaptiveIcon": {
@@ -29,7 +28,8 @@
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.stadium"
+      "bundleIdentifier": "com.stadium",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "web": {
       "favicon": "./assets/images/app-icon-web-favicon.png",
@@ -38,6 +38,16 @@
     "plugins": [
       "expo-localization",
       "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       [
         "expo-splash-screen",
         {

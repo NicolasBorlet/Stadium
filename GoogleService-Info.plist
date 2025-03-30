@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>702787652384-803vh6fp10g8v1lmlhvi1uikqs65vuao.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.702787652384-803vh6fp10g8v1lmlhvi1uikqs65vuao</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDm7ggdH1Q5jmjG7BdrqL_sgvQRjxjSfXY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>702787652384</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.stadium</string>
+	<key>PROJECT_ID</key>
+	<string>stadium-e1abe</string>
+	<key>STORAGE_BUCKET</key>
+	<string>stadium-e1abe.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:702787652384:ios:49b2d5e2953c4228ebe545</string>
+</dict>
+</plist>

@@ -1,33 +1,23 @@
-import { useEffect, useState } from "react"
-import { Slot, SplashScreen } from "expo-router"
-import { KeyboardProvider } from "react-native-keyboard-controller"
-
-import { useInitialRootStore } from "@/models"
-import { useFonts } from "@expo-google-fonts/space-grotesk"
-import { customFontsToLoad } from "@/theme"
+import { AuthProvider, useAuth } from "@/contexts/AuthContext"
 import { initI18n } from "@/i18n"
+import { useInitialRootStore } from "@/models"
+import { customFontsToLoad } from "@/theme"
 import { loadDateFnsLocale } from "@/utils/formatDate"
 import { useThemeProvider } from "@/utils/useAppTheme"
-
-SplashScreen.preventAutoHideAsync()
-
-if (__DEV__) {
-  // Load Reactotron configuration in development. We don't want to
-  // include this in our production bundle, so we are using `if (__DEV__)`
-  // to only execute this in development.
-  require("src/devtools/ReactotronConfig.ts")
-}
+import { useFonts } from "@expo-google-fonts/space-grotesk"
+import { Slot, useRouter } from "expo-router"
+import { useEffect, useState } from "react"
+import { KeyboardProvider } from "react-native-keyboard-controller"
 
 export { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary"
 
-export default function Root() {
-  // Wait for stores to load and render our layout inside of it so we have access
-  // to auth info etc
+function RootLayoutNav() {
   const { rehydrated } = useInitialRootStore()
-
   const [fontsLoaded, fontError] = useFonts(customFontsToLoad)
   const [isI18nInitialized, setIsI18nInitialized] = useState(false)
   const { themeScheme, setThemeContextOverride, ThemeProvider } = useThemeProvider()
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     initI18n()
@@ -35,19 +25,32 @@ export default function Root() {
       .then(() => loadDateFnsLocale())
   }, [])
 
-  const loaded = fontsLoaded && isI18nInitialized && rehydrated
-
   useEffect(() => {
     if (fontError) throw fontError
   }, [fontError])
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync()
-    }
-  }, [loaded])
+    console.log("Auth state:", { user, isLoading, fontsLoaded, isI18nInitialized })
 
-  if (!loaded) {
+    if (isLoading || !fontsLoaded || !isI18nInitialized) {
+      console.log("Waiting for initialization...")
+      return
+    }
+
+    // Si l'utilisateur n'est pas connecté, rediriger vers la connexion
+    if (!user) {
+      console.log("User not authenticated, redirecting to sign-in")
+      router.replace("/sign-in")
+    }
+    // Si l'utilisateur est connecté, rediriger vers les onglets
+    else {
+      console.log("User authenticated, redirecting to tabs")
+      router.replace("/(auth)/(tabs)/matches")
+    }
+  }, [user, isLoading, fontsLoaded, isI18nInitialized])
+
+  if (!fontsLoaded || !isI18nInitialized) {
+    console.log("Loading...")
     return null
   }
 
@@ -57,5 +60,13 @@ export default function Root() {
         <Slot />
       </KeyboardProvider>
     </ThemeProvider>
+  )
+}
+
+export default function Root() {
+  return (
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   )
 }

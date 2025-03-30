@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "702787652384",
+    "project_id": "stadium-e1abe",
+    "storage_bucket": "stadium-e1abe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702787652384:android:c0e45adfc651c696ebe545",
+        "android_client_info": {
+          "package_name": "com.stadium"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdqEDKOFunMP-fc9rWU8ggR2233uidowU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
