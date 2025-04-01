@@ -1,16 +1,17 @@
-import auth from "@react-native-firebase/auth"
+import { auth } from "@/config/firebase"
+import { UserData, userService } from "@/services/firestore"
+import {
+  createUserWithEmailAndPassword,
+  FirebaseAuthTypes,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "@react-native-firebase/auth"
 import { createContext, useContext, useEffect, useState } from "react"
 
-interface User {
-  id: string
-  email: string
-  name: string
-  country: string
-  memberSince: string
-}
-
 interface AuthContextType {
-  user: User | null
+  user: UserData | null
   isLoading: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, name: string, country: string) => Promise<void>
@@ -20,29 +21,35 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<UserData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     console.log("Setting up Firebase Auth listener")
-    // Écouter les changements d'état d'authentification
-    const unsubscribe = auth().onAuthStateChanged((firebaseUser) => {
-      console.log("Firebase Auth state changed:", firebaseUser?.uid)
-      if (firebaseUser) {
-        // Convertir l'utilisateur Firebase en format User
-        const userData: User = {
-          id: firebaseUser.uid,
-          email: firebaseUser.email || "",
-          name: firebaseUser.displayName || "Utilisateur",
-          country: "France", // À récupérer depuis Firestore plus tard
-          memberSince: firebaseUser.metadata.creationTime || new Date().toISOString(),
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser: FirebaseAuthTypes.User | null) => {
+        console.log("Firebase Auth state changed:", firebaseUser?.uid)
+        if (firebaseUser) {
+          try {
+            const userData = await userService.getUser(firebaseUser.uid)
+            if (!userData) {
+              console.log("User not found in Firestore, signing out")
+              await signOut(auth)
+              setUser(null)
+            } else {
+              setUser(userData)
+            }
+          } catch (error) {
+            console.error("Error fetching user data:", error)
+            setUser(null)
+          }
+        } else {
+          setUser(null)
         }
-        setUser(userData)
-      } else {
-        setUser(null)
-      }
-      setIsLoading(false)
-    })
+        setIsLoading(false)
+      },
+    )
 
     return () => {
       console.log("Cleaning up Firebase Auth listener")
@@ -54,7 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     try {
       console.log("Attempting to sign in with:", email)
-      await auth().signInWithEmailAndPassword(email, password)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+
+      const userData = await userService.getUser(userCredential.user.uid)
+      if (!userData) {
+        throw new Error("User not found in database")
+      }
+
+      setUser(userData)
     } catch (error) {
       console.error("Sign in error:", error)
       throw error
@@ -67,11 +81,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     try {
       console.log("Attempting to sign up with:", email)
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password)
-      await userCredential.user.updateProfile({
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      await updateProfile(userCredential.user, {
         displayName: name,
       })
-      // TODO: Sauvegarder les informations supplémentaires (country) dans Firestore
+
+      const userData = await userService.createUser({
+        email,
+        name,
+        country,
+        memberSince: new Date(),
+      })
+
+      setUser(userData)
     } catch (error) {
       console.error("Sign up error:", error)
       throw error
@@ -80,11 +102,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     setIsLoading(true)
     try {
       console.log("Attempting to sign out")
-      await auth().signOut()
+      await signOut(auth)
+      setUser(null)
     } catch (error) {
       console.error("Sign out error:", error)
       throw error
@@ -94,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   )

@@ -14,8 +14,8 @@
  * Read more here: https://reactnative.dev/docs/security#storing-sensitive-info
  */
 import BaseConfig from "./config.base"
-import ProdConfig from "./config.prod"
 import DevConfig from "./config.dev"
+import ProdConfig from "./config.prod"
 
 let ExtraConfig = ProdConfig
 
@@ -25,4 +25,10 @@ if (__DEV__) {
 
 const Config = { ...BaseConfig, ...ExtraConfig }
 
-export default Config
+export default {
+  API_URL: "https://v3.football.api-sports.io",
+  API_FOOTBALL_KEY: "9abc227b78msh33fdbb9b45e2c36p1d28e0jsn1d158a68094e", // Remplacez par votre clé API
+  persistNavigation: "dev" as const,
+  catchErrors: "always" as const,
+  exitRoutes: ["sign-in"] as const,
+}

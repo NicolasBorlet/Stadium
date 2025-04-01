@@ -1,15 +1,14 @@
-import { initializeApp } from "@react-native-firebase/app"
-import auth from "@react-native-firebase/auth"
+import { getAuth } from "@react-native-firebase/auth"
+import { getFirestore } from "@react-native-firebase/firestore"
 
-// Initialize Firebase
-const app = initializeApp({
-  apiKey: "AIzaSyBdqEDKOFunMP-fc9rWU8ggR2233uidowU",
-  authDomain: "stadium-e1abe.firebaseapp.com",
-  projectId: "stadium-e1abe",
-  storageBucket: "stadium-e1abe.firebasestorage.app",
-  messagingSenderId: "702787652384",
-  appId: "1:702787652384:ios:49b2d5e2953c4228ebe545",
-})
+declare global {
+  var RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS: boolean
+}
 
-export { auth }
-export default app
+// Silence deprecation warnings
+globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true
+
+export const auth = getAuth()
+export const db = getFirestore()
+
+export default auth

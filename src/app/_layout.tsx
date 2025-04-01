@@ -1,3 +1,4 @@
+import "@/config/firebase"
 import { AuthProvider, useAuth } from "@/contexts/AuthContext"
 import { initI18n } from "@/i18n"
 import { useInitialRootStore } from "@/models"
@@ -5,11 +6,21 @@ import { customFontsToLoad } from "@/theme"
 import { loadDateFnsLocale } from "@/utils/formatDate"
 import { useThemeProvider } from "@/utils/useAppTheme"
 import { useFonts } from "@expo-google-fonts/space-grotesk"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Slot, useRouter } from "expo-router"
 import { useEffect, useState } from "react"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 
 export { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary"
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 function RootLayoutNav() {
   const { rehydrated } = useInitialRootStore()
@@ -65,8 +76,10 @@ function RootLayoutNav() {
 
 export default function Root() {
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
