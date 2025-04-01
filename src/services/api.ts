@@ -1,5 +1,5 @@
 import Config from "@/config"
-import { createApi } from "apisauce"
+import { create } from "apisauce"
 
 export interface Team {
   id: number
@@ -43,7 +43,7 @@ export interface Match {
   }
 }
 
-const api = createApi({
+const api = create({
   baseURL: "https://v3.football.api-sports.io",
   timeout: 10000,
   headers: {

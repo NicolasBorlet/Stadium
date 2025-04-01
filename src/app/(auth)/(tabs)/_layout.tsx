@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { Tabs } from "expo-router"
+import { CustomTabBar } from "../../components/CustomTabBar"
 
 export default function TabsLayout() {
   return (
@@ -9,6 +10,9 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: "#8E8E93",
         headerShown: false,
       }}
+      tabBar={({ state, descriptors, navigation }) => (
+        <CustomTabBar state={state} descriptors={descriptors} navigation={navigation} />
+      )}
     >
       <Tabs.Screen
         name="matches"
@@ -26,6 +30,13 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="stadium" size={size} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="plus"
+        options={{
+          title: "",
+          tabBarButton: () => null,
         }}
       />
       <Tabs.Screen
