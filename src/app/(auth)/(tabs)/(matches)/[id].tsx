@@ -5,7 +5,6 @@ import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { router, useLocalSearchParams } from "expo-router"
-import { useEffect } from "react"
 import { ActivityIndicator, TextStyle, View, ViewStyle } from "react-native"
 
 export default function Match() {
@@ -13,14 +12,6 @@ export default function Match() {
   const { id } = useLocalSearchParams()
 
   const { data: match, isLoading, error } = useUserMatch(id as string)
-
-  useEffect(() => {
-    if (match) {
-      console.log(match)
-    } else {
-      console.log("no match", id)
-    }
-  }, [match, id])
 
   if (isLoading) {
     return (
