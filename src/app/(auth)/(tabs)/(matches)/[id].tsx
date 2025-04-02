@@ -1,4 +1,5 @@
 import { Header, Screen, Text } from "@/components"
+import { AnimatedText } from "@/components/AnimatedText"
 import { useUserMatch } from "@/hooks/useFirestore"
 import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
@@ -32,7 +33,7 @@ export default function Match() {
   if (error) {
     return (
       <View style={themed($errorContainer)}>
-        <Text>Une erreur est survenue</Text>
+        <AnimatedText>Une erreur est survenue</AnimatedText>
       </View>
     )
   }
@@ -40,7 +41,7 @@ export default function Match() {
   if (!match) {
     return (
       <View style={themed($errorContainer)}>
-        <Text>Aucun match trouvé</Text>
+        <AnimatedText>Aucun match trouvé</AnimatedText>
       </View>
     )
   }
@@ -56,7 +57,11 @@ export default function Match() {
       <View style={themed($content)}>
         {/* En-tête */}
         <View style={themed($header)}>
-          <Text text={`${match.homeTeam.name} vs ${match.awayTeam.name}`} preset="heading" />
+          <AnimatedText
+            sharedTransitionTag={`match-title-${match.id}`}
+            preset="heading"
+            text={`${match.homeTeam.name} vs ${match.awayTeam.name}`}
+          />
         </View>
 
         {/* Informations principales */}
@@ -98,8 +103,8 @@ export default function Match() {
         <View style={themed($card)}>
           <View style={themed($scoreContainer)}>
             <View style={themed($teamContainer)}>
-              <Text text={match.homeTeam.name} preset="subheading" />
-              <Text text={match.score[1].home?.toString() ?? "0"} preset="heading" />
+              <AnimatedText text={match.homeTeam.name} preset="subheading" />
+              <AnimatedText text={match.score[1].home?.toString() ?? "0"} preset="heading" />
             </View>
             <Text text="-" preset="heading" />
             <View style={themed($teamContainer)}>
@@ -155,6 +160,7 @@ const $scoreContainer: ThemedStyle<ViewStyle> = () => ({
 
 const $teamContainer: ThemedStyle<ViewStyle> = () => ({
   alignItems: "center",
+  flex: 1,
 })
 
 const $loadingContainer: ThemedStyle<ViewStyle> = () => ({

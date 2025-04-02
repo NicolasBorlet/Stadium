@@ -1,4 +1,5 @@
 import { Screen, Text } from "@/components"
+import { AnimatedText } from "@/components/AnimatedText"
 import { useUserMatches } from "@/hooks/useFirestore"
 import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
@@ -17,7 +18,9 @@ const MatchItem = ({ item }: { item: any }) => {
         borderWidth: 1,
         borderColor: "rgba(0, 0, 0, 0.05)",
       }}
-      onPress={() => router.push(`/(auth)/(tabs)/(matches)/${item.id}`)}
+      onPress={() => {
+        router.push(`/(auth)/(tabs)/(matches)/${item.id}`)
+      }}
     >
       <View
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}
@@ -25,9 +28,12 @@ const MatchItem = ({ item }: { item: any }) => {
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
             <MaterialCommunityIcons name="soccer" size={20} color="#007AFF" />
-            <Text style={{ fontSize: 17, fontWeight: "600", marginLeft: 8, color: "#000" }}>
+            <AnimatedText
+              sharedTransitionTag={`match-title-${item.id}`}
+              style={{ fontSize: 17, fontWeight: "600", marginLeft: 8, color: "#000" }}
+            >
               {item.homeTeam.name} vs {item.awayTeam.name}
-            </Text>
+            </AnimatedText>
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
