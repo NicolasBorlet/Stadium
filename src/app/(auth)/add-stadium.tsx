@@ -1,12 +1,13 @@
 import { Screen, Text } from "@/components"
 import { Header } from "@/components/Header"
+import Config from "@/config"
 import { useCreateStadium, useSearchStadiums } from "@/hooks/useFirestore"
 import { StadiumData } from "@/services/firestore"
 import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { router } from "expo-router"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
   FlatList,
@@ -73,6 +74,23 @@ export default function AddStadium() {
       fetchNextPage()
     }
   }
+
+  useEffect(() => {
+    console.log("fetching")
+    fetch("https://v3.football.api-sports.io/leagues", {
+      method: "GET",
+      headers: {
+        "x-rapidapi-host": "v3.football.api-sports.io",
+        "x-rapidapi-key": Config.API_FOOTBALL_KEY,
+      },
+    })
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [])
 
   return (
     <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)}>

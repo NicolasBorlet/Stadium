@@ -62,7 +62,7 @@ export default function StadiaScreen() {
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Une erreur est survenue</Text>
+        <Text tx="stadium:list.error" />
       </View>
     )
   }
@@ -70,7 +70,7 @@ export default function StadiaScreen() {
   if (!stadiums?.length) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Aucun stade trouvé</Text>
+        <Text tx="stadium:list.noStadiums" />
       </View>
     )
   }
@@ -81,7 +81,7 @@ export default function StadiaScreen() {
         <View
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
         >
-          <Text text="Stadium" preset="heading" />
+          <Text tx="stadium:list.title" preset="heading" />
         </View>
         <FlatList
           data={stadiums}

@@ -5,9 +5,16 @@ import {
   publicStadiumService,
   StadiumData,
   stadiumService,
+  teamService,
 } from "@/services/firestore"
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+
+interface Team {
+  id: string
+  name: string
+  image: string
+}
 
 // Hooks pour les stades
 export function useUserStadiums() {
@@ -170,4 +177,20 @@ export function useSearchStadiums(searchTerm: string) {
     ...query,
     hasMore,
   }
+}
+
+export function useTeams() {
+  return useQuery({
+    queryKey: ["teams"],
+    queryFn: () => teamService.getTeams(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export function useStadiums() {
+  return useQuery({
+    queryKey: ["stadiums"],
+    queryFn: () => stadiumService.getStadiums(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
 }

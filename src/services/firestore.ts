@@ -65,6 +65,12 @@ export interface MatchData {
   updatedAt: Date
 }
 
+export interface TeamData {
+  id: string
+  name: string
+  image: string
+}
+
 export const userService = {
   async createUser(data: Omit<UserData, "id">) {
     const userId = auth.currentUser?.uid
@@ -131,6 +137,14 @@ export const stadiumService = {
   async deleteStadium(userId: string, stadiumId: string) {
     await deleteDoc(doc(db, "users", userId, "stadiums", stadiumId))
   },
+
+  async getStadiums() {
+    const stadiumsSnapshot = await getDocs(collection(db, "stadiums"))
+    return stadiumsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as StadiumData[]
+  },
 }
 
 export const matchService = {
@@ -191,5 +205,15 @@ export const publicStadiumService = {
       stadiums: snapshot.docs.map((doc) => doc.data() as StadiumData),
       lastDoc: snapshot.docs[snapshot.docs.length - 1],
     }
+  },
+}
+
+export const teamService = {
+  async getTeams() {
+    const teamsSnapshot = await getDocs(collection(db, "teams"))
+    return teamsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as TeamData[]
   },
 }

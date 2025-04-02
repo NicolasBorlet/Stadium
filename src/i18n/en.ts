@@ -121,6 +121,30 @@ const en = {
         "No favorites have been added yet. Tap the heart on an episode to add it to your favorites!",
     },
   },
+  stadium: {
+    details: {
+      title: "Stadium Details",
+      capacity: "Capacity: {{capacity}} seats",
+      surface: "Surface: {{surface}}",
+    },
+    list: {
+      title: "Stadiums",
+      noStadiums: "No stadiums found",
+      error: "An error occurred",
+    },
+  },
+  match: {
+    details: {
+      title: "Match Details",
+      score: "Score: {{home}} - {{away}}",
+      referee: "Referee: {{referee}}",
+    },
+    list: {
+      title: "Matches",
+      noMatches: "No matches found",
+      error: "An error occurred",
+    },
+  },
 
   ...demoEn,
 }

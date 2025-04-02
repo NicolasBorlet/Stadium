@@ -38,9 +38,11 @@ const MatchItem = ({ item }: { item: any }) => {
 
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
             <MaterialCommunityIcons name="scoreboard" size={18} color="#8E8E93" />
-            <Text style={{ fontSize: 15, marginLeft: 8, color: "#8E8E93" }}>
-              Score : {item.score[1].home ?? 0} - {item.score[1].away ?? 0}
-            </Text>
+            <Text
+              style={{ fontSize: 15, marginLeft: 8, color: "#8E8E93" }}
+              tx="match:details.score"
+              txOptions={{ home: item.score[1].home ?? 0, away: item.score[1].away ?? 0 }}
+            />
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -71,7 +73,7 @@ export default function MatchesScreen() {
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Une erreur est survenue</Text>
+        <Text tx="match:list.error" />
       </View>
     )
   }
@@ -79,7 +81,7 @@ export default function MatchesScreen() {
   if (!matches?.length) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Aucun match trouvé</Text>
+        <Text tx="match:list.noMatches" />
       </View>
     )
   }
@@ -90,7 +92,7 @@ export default function MatchesScreen() {
         <View
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
         >
-          <Text text="Matchs" preset="heading" />
+          <Text tx="match:list.title" preset="heading" />
         </View>
         <FlatList
           data={matches}

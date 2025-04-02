@@ -27,7 +27,7 @@ const Config = { ...BaseConfig, ...ExtraConfig }
 
 export default {
   API_URL: "https://v3.football.api-sports.io",
-  API_FOOTBALL_KEY: "9abc227b78msh33fdbb9b45e2c36p1d28e0jsn1d158a68094e", // Remplacez par votre clé API
+  API_FOOTBALL_KEY: "e97dc60fbccd40f546178c5e60e5fa10", // Remplacez par votre clé API
   persistNavigation: "dev" as const,
   catchErrors: "always" as const,
   exitRoutes: ["sign-in"] as const,

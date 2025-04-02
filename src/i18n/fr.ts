@@ -124,7 +124,30 @@ const fr: Translations = {
         "Aucun favori n'a été ajouté pour le moment. Appuyez sur le cœur d'un épisode pour l'ajouter à vos favoris !",
     },
   },
-
+  stadium: {
+    details: {
+      title: "Détails du stade",
+      capacity: "Capacité : {{capacity}} places",
+      surface: "Surface : {{surface}}",
+    },
+    list: {
+      title: "Stades",
+      noStadiums: "Aucun stade trouvé",
+      error: "Une erreur est survenue",
+    },
+  },
+  match: {
+    details: {
+      title: "Détails du match",
+      score: "Score : {{home}} - {{away}}",
+      referee: "Arbitre : {{referee}}",
+    },
+    list: {
+      title: "Matchs",
+      noMatches: "Aucun match trouvé",
+      error: "Une erreur est survenue",
+    },
+  },
   ...demoFr,
 }
 

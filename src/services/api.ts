@@ -1,5 +1,4 @@
 import Config from "@/config"
-import { create } from "apisauce"
 
 export interface Team {
   id: number
@@ -41,51 +40,102 @@ export interface Match {
       away: number | null
     }
   }
+  league: {
+    id: number
+    name: string
+    country: string
+    logo: string
+    flag: string
+  }
 }
 
-const api = create({
-  baseURL: "https://v3.football.api-sports.io",
-  timeout: 10000,
-  headers: {
-    "x-rapidapi-host": "v3.football.api-sports.io",
-    "x-rapidapi-key": Config.API_FOOTBALL_KEY,
-  },
-})
+const API_URL = "https://v3.football.api-sports.io"
+const headers = {
+  "x-rapidapi-host": "v3.football.api-sports.io",
+  "x-rapidapi-key": Config.API_FOOTBALL_KEY,
+}
+
+async function fetchApi<T>(endpoint: string, params: Record<string, any> = {}): Promise<T> {
+  const queryParams = new URLSearchParams(params)
+  const url = `${API_URL}${endpoint}?${queryParams.toString()}`
+
+  try {
+    const response = await fetch(url, { headers })
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(`Error fetching ${endpoint}:`, error)
+    throw error
+  }
+}
 
 export const footballService = {
   async searchTeams(query: string) {
-    const response = await api.get<{ response: Team[] }>("/teams", {
-      search: query,
-    })
-    return response.data?.response || []
+    try {
+      const data = await fetchApi<{ response: Team[] }>("/teams", { search: query })
+      return data.response || []
+    } catch (error) {
+      console.error("Error searching teams:", error)
+      return []
+    }
   },
 
   async getTeamById(teamId: number) {
-    const response = await api.get<{ response: Team[] }>("/teams", {
-      id: teamId,
-    })
-    return response.data?.response[0] || null
+    try {
+      const data = await fetchApi<{ response: Team[] }>("/teams", { id: teamId })
+      return data.response[0] || null
+    } catch (error) {
+      console.error("Error getting team:", error)
+      return null
+    }
   },
 
   async getTeamMatches(teamId: number, season: number = new Date().getFullYear()) {
-    const response = await api.get<{ response: Match[] }>("/fixtures", {
-      team: teamId,
-      season,
-    })
-    return response.data?.response || []
+    try {
+      const data = await fetchApi<{ response: Match[] }>("/fixtures", {
+        team: teamId,
+        season,
+      })
+      return data.response || []
+    } catch (error) {
+      console.error("Error getting team matches:", error)
+      return []
+    }
   },
 
   async getStadiumById(stadiumId: number) {
-    const response = await api.get<{ response: Stadium[] }>("/venues", {
-      id: stadiumId,
-    })
-    return response.data?.response[0] || null
+    try {
+      const data = await fetchApi<{ response: Stadium[] }>("/venues", { id: stadiumId })
+      return data.response[0] || null
+    } catch (error) {
+      console.error("Error getting stadium:", error)
+      return null
+    }
   },
 
   async getMatchById(matchId: number) {
-    const response = await api.get<{ response: Match[] }>("/fixtures", {
-      id: matchId,
-    })
-    return response.data?.response[0] || null
+    try {
+      const data = await fetchApi<{ response: Match[] }>("/fixtures", { id: matchId })
+      return data.response[0] || null
+    } catch (error) {
+      console.error("Error getting match:", error)
+      return null
+    }
+  },
+
+  async getMatchesByDate(date: string) {
+    try {
+      const data = await fetchApi<{ response: Match[] }>("/fixtures", {
+        date,
+        league: "61,62", // Ligue 1 (61) and Ligue 2 (62)
+      })
+      return data.response || []
+    } catch (error) {
+      console.error("Error getting matches by date:", error)
+      return []
+    }
   },
 }

@@ -24,7 +24,7 @@ export default function Match() {
   if (error) {
     return (
       <View style={themed($errorContainer)}>
-        <Text>Une erreur est survenue</Text>
+        <Text tx="match:list.error" />
       </View>
     )
   }
@@ -32,7 +32,7 @@ export default function Match() {
   if (!match) {
     return (
       <View style={themed($errorContainer)}>
-        <Text>Aucun match trouvé</Text>
+        <Text tx="match:list.noMatches" />
       </View>
     )
   }
@@ -44,7 +44,7 @@ export default function Match() {
 
   return (
     <Screen contentContainerStyle={themed($container)}>
-      <Header title="Détails du match" leftIcon="back" onLeftPress={() => router.back()} />
+      <Header titleTx="match:details.title" leftIcon="back" onLeftPress={() => router.back()} />
       <View style={themed($content)}>
         {/* En-tête */}
         <View style={themed($header)}>
@@ -86,7 +86,11 @@ export default function Match() {
 
           <View style={themed($infoRow)}>
             <MaterialCommunityIcons name="whistle" size={20} color="#007AFF" />
-            <Text style={themed($infoText)}>Arbitre: {match.referee}</Text>
+            <Text
+              style={themed($infoText)}
+              tx="match:details.referee"
+              txOptions={{ referee: match.referee }}
+            />
           </View>
         </View>
 

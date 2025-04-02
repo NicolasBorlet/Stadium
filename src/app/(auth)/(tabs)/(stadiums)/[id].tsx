@@ -24,7 +24,7 @@ export default function Stadium() {
   if (error) {
     return (
       <View style={themed($errorContainer)}>
-        <AnimatedText>Une erreur est survenue</AnimatedText>
+        <AnimatedText tx="stadium:list.error" />
       </View>
     )
   }
@@ -32,14 +32,14 @@ export default function Stadium() {
   if (!stadium) {
     return (
       <View style={themed($errorContainer)}>
-        <AnimatedText>Aucun stade trouvé</AnimatedText>
+        <AnimatedText tx="stadium:list.noStadiums" />
       </View>
     )
   }
 
   return (
     <Screen contentContainerStyle={themed($container)}>
-      <Header title="Détails du stade" leftIcon="back" onLeftPress={() => router.back()} />
+      <Header titleTx="stadium:details.title" leftIcon="back" onLeftPress={() => router.back()} />
       <View style={themed($content)}>
         {/* En-tête */}
         <View style={themed($header)}>
@@ -71,14 +71,20 @@ export default function Stadium() {
 
           <View style={themed($infoRow)}>
             <MaterialCommunityIcons name="account-group" size={20} color="#007AFF" />
-            <AnimatedText style={themed($infoText)}>
-              Capacité : {stadium.capacity} places
-            </AnimatedText>
+            <AnimatedText
+              style={themed($infoText)}
+              tx="stadium:details.capacity"
+              txOptions={{ capacity: stadium.capacity }}
+            />
           </View>
 
           <View style={themed($infoRow)}>
             <MaterialCommunityIcons name="grass" size={20} color="#007AFF" />
-            <AnimatedText style={themed($infoText)}>Surface : {stadium.surface}</AnimatedText>
+            <AnimatedText
+              style={themed($infoText)}
+              tx="stadium:details.surface"
+              txOptions={{ surface: stadium.surface }}
+            />
           </View>
         </View>
       </View>
