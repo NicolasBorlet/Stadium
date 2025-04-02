@@ -5,7 +5,7 @@ import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { router, useLocalSearchParams } from "expo-router"
-import { ActivityIndicator, TextStyle, View, ViewStyle } from "react-native"
+import { ActivityIndicator, Image, TextStyle, View, ViewStyle } from "react-native"
 
 export default function Match() {
   const { themed } = useAppTheme()
@@ -98,12 +98,24 @@ export default function Match() {
         <View style={themed($card)}>
           <View style={themed($scoreContainer)}>
             <View style={themed($teamContainer)}>
-              <AnimatedText text={match.homeTeam.name} preset="subheading" />
+              <Image
+                source={{ uri: match.homeTeam.logo }}
+                style={{
+                  height: 50,
+                  width: 50,
+                }}
+              />
               <AnimatedText text={match.score[1].home?.toString() ?? "0"} preset="heading" />
             </View>
             <Text text="-" preset="heading" />
             <View style={themed($teamContainer)}>
-              <Text text={match.awayTeam.name} preset="subheading" />
+              <Image
+                source={{ uri: match.awayTeam.logo }}
+                style={{
+                  height: 50,
+                  width: 50,
+                }}
+              />
               <Text text={match.score[1].away?.toString() ?? "0"} preset="heading" />
             </View>
           </View>
@@ -156,6 +168,7 @@ const $scoreContainer: ThemedStyle<ViewStyle> = () => ({
 const $teamContainer: ThemedStyle<ViewStyle> = () => ({
   alignItems: "center",
   flex: 1,
+  gap: 8,
 })
 
 const $loadingContainer: ThemedStyle<ViewStyle> = () => ({

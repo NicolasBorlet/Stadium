@@ -149,7 +149,7 @@ export const stadiumService = {
 
 export const matchService = {
   async createMatch(userId: string, data: Omit<MatchData, "id" | "createdAt" | "updatedAt">) {
-    const matchRef = doc(collection(db, "users", userId, "matches"))
+    const matchRef = doc(collection(db, "users", userId, "matchs"))
 
     const matchData: MatchData = {
       id: matchRef.id,
