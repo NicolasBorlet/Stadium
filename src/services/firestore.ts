@@ -5,10 +5,13 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   setDoc,
+  startAfter,
   updateDoc,
+  where,
 } from "@react-native-firebase/firestore"
 
 export interface UserData {
@@ -166,5 +169,27 @@ export const matchService = {
 
   async deleteMatch(userId: string, matchId: string) {
     await deleteDoc(doc(db, "users", userId, "matchs", matchId))
+  },
+}
+
+export const publicStadiumService = {
+  async searchStadiums(searchTerm: string, lastDoc?: any) {
+    let q = query(collection(db, "stadiums"), orderBy("name"))
+
+    if (searchTerm) {
+      q = query(q, where("name", ">=", searchTerm), where("name", "<=", searchTerm + "\uf8ff"))
+    }
+
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc))
+    }
+
+    q = query(q, limit(10))
+    const snapshot = await getDocs(q)
+
+    return {
+      stadiums: snapshot.docs.map((doc) => doc.data() as StadiumData),
+      lastDoc: snapshot.docs[snapshot.docs.length - 1],
+    }
   },
 }

@@ -53,11 +53,7 @@ export default function Stadium() {
         {/* Image */}
         {stadium.image && (
           <View style={themed($imageContainer)}>
-            <Image
-              source={{ uri: "https://picsum.photos/200/300" }}
-              style={themed($image)}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: stadium.image }} style={themed($image)} resizeMode="cover" />
           </View>
         )}
 

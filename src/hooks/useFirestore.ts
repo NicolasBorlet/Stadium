@@ -1,6 +1,13 @@
 import { useAuth } from "@/contexts/AuthContext"
-import { MatchData, matchService, StadiumData, stadiumService } from "@/services/firestore"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  MatchData,
+  matchService,
+  publicStadiumService,
+  StadiumData,
+  stadiumService,
+} from "@/services/firestore"
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
 
 // Hooks pour les stades
 export function useUserStadiums() {
@@ -140,4 +147,27 @@ export function useUserStats() {
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
+}
+
+export function useSearchStadiums(searchTerm: string) {
+  const [lastDoc, setLastDoc] = useState<any>(null)
+  const [hasMore, setHasMore] = useState(true)
+
+  const query = useInfiniteQuery({
+    queryKey: ["searchStadiums", searchTerm],
+    queryFn: async ({ pageParam }) => {
+      const result = await publicStadiumService.searchStadiums(searchTerm, pageParam)
+      setLastDoc(result.lastDoc)
+      setHasMore(result.stadiums.length === 10)
+      return result.stadiums
+    },
+    initialPageParam: null,
+    getNextPageParam: () => lastDoc,
+    enabled: !!searchTerm,
+  })
+
+  return {
+    ...query,
+    hasMore,
+  }
 }
