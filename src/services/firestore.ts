@@ -71,6 +71,36 @@ export interface TeamData {
   image: string
 }
 
+export interface BadgeData {
+  id: string
+  name: string
+  description: string
+  image: string
+  createdAt: Date
+}
+
+export interface FriendData {
+  id: string
+  userId: string
+  friendId: string
+  status: "pending" | "accepted" | "rejected"
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface UserStats {
+  mostVisitedStadium: {
+    id: string
+    name: string
+    count: number
+  }
+  mostWatchedTeam: {
+    id: string
+    name: string
+    count: number
+  }
+}
+
 export const userService = {
   async createUser(data: Omit<UserData, "id">) {
     const userId = auth.currentUser?.uid
@@ -215,5 +245,129 @@ export const teamService = {
       id: doc.id,
       ...doc.data(),
     })) as TeamData[]
+  },
+}
+
+export const badgeService = {
+  async getUserBadges(userId: string) {
+    const q = query(collection(db, "users", userId, "badges"))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => doc.data() as BadgeData)
+  },
+
+  async addBadgeToUser(userId: string, badgeId: string) {
+    const badgeRef = doc(db, "badges", badgeId)
+    const badgeSnap = await getDoc(badgeRef)
+
+    if (!badgeSnap.exists) {
+      throw new Error("Badge not found")
+    }
+
+    const badgeData = badgeSnap.data() as BadgeData
+    await setDoc(doc(db, "users", userId, "badges", badgeId), {
+      ...badgeData,
+      createdAt: new Date(),
+    })
+  },
+
+  async removeBadgeFromUser(userId: string, badgeId: string) {
+    await deleteDoc(doc(db, "users", userId, "badges", badgeId))
+  },
+}
+
+export const friendService = {
+  async getFriends(userId: string) {
+    const q = query(collection(db, "users", userId, "friends"), where("status", "==", "accepted"))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => doc.data() as FriendData)
+  },
+
+  async getFriendRequests(userId: string) {
+    const q = query(collection(db, "users", userId, "friends"), where("status", "==", "pending"))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => doc.data() as FriendData)
+  },
+
+  async sendFriendRequest(userId: string, friendId: string) {
+    const friendRef = doc(collection(db, "users", userId, "friends"))
+    const friendData: FriendData = {
+      id: friendRef.id,
+      userId,
+      friendId,
+      status: "pending",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    await setDoc(friendRef, friendData)
+    return friendData
+  },
+
+  async acceptFriendRequest(userId: string, requestId: string) {
+    await updateDoc(doc(db, "users", userId, "friends", requestId), {
+      status: "accepted",
+      updatedAt: new Date(),
+    })
+  },
+
+  async rejectFriendRequest(userId: string, requestId: string) {
+    await updateDoc(doc(db, "users", userId, "friends", requestId), {
+      status: "rejected",
+      updatedAt: new Date(),
+    })
+  },
+
+  async removeFriend(userId: string, friendId: string) {
+    await deleteDoc(doc(db, "users", userId, "friends", friendId))
+  },
+}
+
+export const statsService = {
+  async getUserStats(userId: string) {
+    const matches = await matchService.getUserMatches(userId)
+
+    // Calculer le stade le plus visité
+    const stadiumCounts = matches.reduce(
+      (acc, match) => {
+        const stadiumId = match.stadium.id
+        acc[stadiumId] = (acc[stadiumId] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const mostVisitedStadiumId = Object.entries(stadiumCounts).reduce((a, b) =>
+      a[1] > b[1] ? a : b,
+    )[0]
+
+    const mostVisitedStadium = await stadiumService.getStadium(userId, mostVisitedStadiumId)
+
+    // Calculer l'équipe la plus vue
+    const teamCounts = matches.reduce(
+      (acc, match) => {
+        const homeTeamId = match.homeTeam.id
+        const awayTeamId = match.awayTeam.id
+        acc[homeTeamId] = (acc[homeTeamId] || 0) + 1
+        acc[awayTeamId] = (acc[awayTeamId] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const mostWatchedTeamId = Object.entries(teamCounts).reduce((a, b) => (a[1] > b[1] ? a : b))[0]
+
+    const mostWatchedTeam = await teamService.getTeam(mostWatchedTeamId)
+
+    return {
+      mostVisitedStadium: {
+        id: mostVisitedStadium?.id || "",
+        name: mostVisitedStadium?.name || "",
+        count: stadiumCounts[mostVisitedStadiumId] || 0,
+      },
+      mostWatchedTeam: {
+        id: mostWatchedTeam?.id || "",
+        name: mostWatchedTeam?.name || "",
+        count: teamCounts[mostWatchedTeamId] || 0,
+      },
+    } as UserStats
   },
 }

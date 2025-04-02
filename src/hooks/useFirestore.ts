@@ -194,3 +194,119 @@ export function useStadiums() {
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
+
+// Hooks pour les badges
+export function useUserBadges() {
+  const { user } = useAuth()
+  return useQuery({
+    queryKey: ["userBadges", "user", user?.id],
+    queryFn: () => badgeService.getUserBadges(user!.id),
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export function useAddBadge() {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
+    mutationFn: (badgeId: string) => badgeService.addBadgeToUser(user!.id, badgeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userBadges", "user", user?.id] })
+    },
+  })
+}
+
+export function useRemoveBadge() {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
+    mutationFn: (badgeId: string) => badgeService.removeBadgeFromUser(user!.id, badgeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userBadges", "user", user?.id] })
+    },
+  })
+}
+
+// Hooks pour les amis
+export function useFriends() {
+  const { user } = useAuth()
+  return useQuery({
+    queryKey: ["friends", "user", user?.id],
+    queryFn: () => friendService.getFriends(user!.id),
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export function useFriendRequests() {
+  const { user } = useAuth()
+  return useQuery({
+    queryKey: ["friendRequests", "user", user?.id],
+    queryFn: () => friendService.getFriendRequests(user!.id),
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export function useSendFriendRequest() {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
+    mutationFn: (friendId: string) => friendService.sendFriendRequest(user!.id, friendId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friendRequests", "user", user?.id] })
+    },
+  })
+}
+
+export function useAcceptFriendRequest() {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
+    mutationFn: (requestId: string) => friendService.acceptFriendRequest(user!.id, requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "user", user?.id] })
+      queryClient.invalidateQueries({ queryKey: ["friendRequests", "user", user?.id] })
+    },
+  })
+}
+
+export function useRejectFriendRequest() {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
+    mutationFn: (requestId: string) => friendService.rejectFriendRequest(user!.id, requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friendRequests", "user", user?.id] })
+    },
+  })
+}
+
+export function useRemoveFriend() {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
+    mutationFn: (friendId: string) => friendService.removeFriend(user!.id, friendId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", "user", user?.id] })
+    },
+  })
+}
+
+// Hook pour les statistiques détaillées
+export function useDetailedUserStats() {
+  const { user } = useAuth()
+  return useQuery({
+    queryKey: ["detailedUserStats", "user", user?.id],
+    queryFn: () => statsService.getUserStats(user!.id),
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
