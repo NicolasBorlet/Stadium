@@ -56,7 +56,7 @@ function RootLayoutNav() {
     // Si l'utilisateur est connecté, rediriger vers les onglets
     else {
       console.log("User authenticated, redirecting to tabs")
-      router.replace("/(auth)/(tabs)/matches")
+      router.replace("/(auth)/(tabs)/(matches)")
     }
   }, [user, isLoading, fontsLoaded, isI18nInitialized])
 

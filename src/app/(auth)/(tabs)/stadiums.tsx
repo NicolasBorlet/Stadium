@@ -80,9 +80,6 @@ export default function StadiaScreen() {
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
         >
           <Text text="Stadium" preset="heading" />
-          <TouchableOpacity>
-            <MaterialCommunityIcons name="plus" size={24} color="black" />
-          </TouchableOpacity>
         </View>
         <FlatList
           data={stadiums}

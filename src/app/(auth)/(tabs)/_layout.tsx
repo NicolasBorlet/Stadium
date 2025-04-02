@@ -15,7 +15,7 @@ export default function TabsLayout() {
       )}
     >
       <Tabs.Screen
-        name="matches"
+        name="(matches)"
         options={{
           title: "Matchs",
           tabBarIcon: ({ color, size }) => (

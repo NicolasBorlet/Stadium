@@ -3,6 +3,7 @@ import { useUserMatches } from "@/hooks/useFirestore"
 import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { router } from "expo-router"
 import { ActivityIndicator, FlatList, TouchableOpacity, View, ViewStyle } from "react-native"
 
 const MatchItem = ({ item }: { item: any }) => {
@@ -16,6 +17,7 @@ const MatchItem = ({ item }: { item: any }) => {
         borderWidth: 1,
         borderColor: "rgba(0, 0, 0, 0.05)",
       }}
+      onPress={() => router.push(`/(auth)/(tabs)/(matches)/${item.id}`)}
     >
       <View
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}
@@ -31,7 +33,7 @@ const MatchItem = ({ item }: { item: any }) => {
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
             <MaterialCommunityIcons name="scoreboard" size={18} color="#8E8E93" />
             <Text style={{ fontSize: 15, marginLeft: 8, color: "#8E8E93" }}>
-              Score : {item.score[0].home ?? 0} - {item.score[0].away ?? 0}
+              Score : {item.score[1].home ?? 0} - {item.score[1].away ?? 0}
             </Text>
           </View>
 
@@ -83,9 +85,6 @@ export default function MatchesScreen() {
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
         >
           <Text text="Matchs" preset="heading" />
-          <TouchableOpacity>
-            <MaterialCommunityIcons name="plus" size={24} color="black" />
-          </TouchableOpacity>
         </View>
         <FlatList
           data={matches}
