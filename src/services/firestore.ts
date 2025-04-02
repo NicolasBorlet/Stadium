@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  increment,
   limit,
   orderBy,
   query,
@@ -189,6 +190,25 @@ export const matchService = {
     }
 
     await setDoc(matchRef, matchData)
+
+    await updateDoc(doc(db, "users", userId), {
+      points: increment(5),
+    })
+
+    const rankingRef = doc(db, "ranking", userId)
+    const rankingSnap = await getDoc(rankingRef)
+
+    if (rankingSnap.exists) {
+      await updateDoc(rankingRef, {
+        points: increment(5),
+      })
+    } else {
+      await setDoc(rankingRef, {
+        user_id: userId,
+        points: 5,
+      })
+    }
+
     return matchData
   },
 
