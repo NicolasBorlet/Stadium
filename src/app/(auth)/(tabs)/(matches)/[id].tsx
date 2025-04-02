@@ -24,7 +24,7 @@ export default function Match() {
   if (error) {
     return (
       <View style={themed($errorContainer)}>
-        <AnimatedText>Une erreur est survenue</AnimatedText>
+        <Text>Une erreur est survenue</Text>
       </View>
     )
   }
@@ -32,7 +32,7 @@ export default function Match() {
   if (!match) {
     return (
       <View style={themed($errorContainer)}>
-        <AnimatedText>Aucun match trouvé</AnimatedText>
+        <Text>Aucun match trouvé</Text>
       </View>
     )
   }

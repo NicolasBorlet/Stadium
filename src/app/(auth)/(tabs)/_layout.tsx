@@ -24,7 +24,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="stadiums"
+        name="(stadiums)"
         options={{
           title: "Stades",
           tabBarIcon: ({ color, size }) => (

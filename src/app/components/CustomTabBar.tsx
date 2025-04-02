@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { router } from "expo-router"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import Animated, {
   Extrapolate,
@@ -131,7 +132,7 @@ export function CustomTabBar({ state, descriptors, navigation }: TabBarProps) {
           style={styles.optionButton}
           onPress={() =>
             handleOptionPress(() => {
-              // TODO: Add match action
+              router.push("/add-match")
             })
           }
         >
@@ -143,7 +144,7 @@ export function CustomTabBar({ state, descriptors, navigation }: TabBarProps) {
           style={styles.optionButton}
           onPress={() =>
             handleOptionPress(() => {
-              // TODO: Add stadium action
+              router.push("/add-stadium")
             })
           }
         >

@@ -1,22 +1,10 @@
-import { StyleSheet, Text, View } from "react-native"
+import { Screen } from "@/components"
+import { Header } from "@/components/Header"
 
 export default function AddStadium() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ajouter un stade</Text>
-    </View>
+    <Screen>
+      <Header title="Ajouter un stade" />
+    </Screen>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-})

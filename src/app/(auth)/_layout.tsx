@@ -8,6 +8,8 @@ export default function AuthLayout() {
       }}
     >
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="add-match" options={{ presentation: "modal" }} />
+      <Stack.Screen name="add-stadium" options={{ presentation: "modal" }} />
     </Stack>
   )
 }
