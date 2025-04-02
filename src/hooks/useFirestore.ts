@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext"
 import {
+  badgeService,
+  friendService,
   MatchData,
   matchService,
   publicStadiumService,
@@ -9,12 +11,6 @@ import {
 } from "@/services/firestore"
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-
-interface Team {
-  id: string
-  name: string
-  image: string
-}
 
 // Hooks pour les stades
 export function useUserStadiums() {
@@ -297,16 +293,5 @@ export function useRemoveFriend() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends", "user", user?.id] })
     },
-  })
-}
-
-// Hook pour les statistiques détaillées
-export function useDetailedUserStats() {
-  const { user } = useAuth()
-  return useQuery({
-    queryKey: ["detailedUserStats", "user", user?.id],
-    queryFn: () => statsService.getUserStats(user!.id),
-    enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }

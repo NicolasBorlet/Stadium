@@ -1,15 +1,11 @@
 import { Button, Screen, Text } from "@/components"
 import { useAuth } from "@/contexts/AuthContext"
-import {
-  useDetailedUserStats,
-  useFriendRequests,
-  useFriends,
-  useUserBadges,
-} from "@/hooks/useFirestore"
+import { useFriendRequests, useFriends, useUserBadges, useUserMatches } from "@/hooks/useFirestore"
 import { BadgeData, FriendData } from "@/services/firestore"
 import { spacing, ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { observer } from "mobx-react-lite"
+import { useMemo } from "react"
 import { Image, ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native"
 
 export default observer(function ProfileScreen() {
@@ -18,7 +14,48 @@ export default observer(function ProfileScreen() {
   const { data: badges } = useUserBadges()
   const { data: friends } = useFriends()
   const { data: friendRequests } = useFriendRequests()
-  const { data: stats } = useDetailedUserStats()
+  const { data: matches } = useUserMatches()
+
+  const stats = useMemo(() => {
+    if (!matches) return null
+
+    // Calculer le stade le plus visité
+    const stadiumCounts = matches.reduce(
+      (acc, match) => {
+        const stadiumName = match.stadium.name
+        acc[stadiumName] = (acc[stadiumName] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const mostVisitedStadium = Object.entries(stadiumCounts).reduce((a, b) => (a[1] > b[1] ? a : b))
+
+    // Calculer l'équipe la plus vue
+    const teamCounts = matches.reduce(
+      (acc, match) => {
+        const homeTeamName = match.homeTeam.name
+        const awayTeamName = match.awayTeam.name
+        acc[homeTeamName] = (acc[homeTeamName] || 0) + 1
+        acc[awayTeamName] = (acc[awayTeamName] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const mostWatchedTeam = Object.entries(teamCounts).reduce((a, b) => (a[1] > b[1] ? a : b))
+
+    return {
+      mostVisitedStadium: {
+        name: mostVisitedStadium[0],
+        count: mostVisitedStadium[1],
+      },
+      mostWatchedTeam: {
+        name: mostWatchedTeam[0],
+        count: mostWatchedTeam[1],
+      },
+    }
+  }, [matches])
 
   const handleSignOut = async () => {
     await signOut()
