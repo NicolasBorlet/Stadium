@@ -43,7 +43,7 @@ export default function Match() {
       : new Date(match.date)
 
   return (
-    <Screen contentContainerStyle={themed($container)}>
+    <Screen contentContainerStyle={themed($container)} preset="scroll">
       <Header titleTx="match:details.title" leftIcon="back" onLeftPress={() => router.back()} />
       <View style={themed($content)}>
         {/* En-tête */}

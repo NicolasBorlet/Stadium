@@ -38,7 +38,7 @@ export default function Stadium() {
   }
 
   return (
-    <Screen contentContainerStyle={themed($container)}>
+    <Screen contentContainerStyle={themed($container)} preset="scroll">
       <Header titleTx="stadium:details.title" leftIcon="back" onLeftPress={() => router.back()} />
       <View style={themed($content)}>
         {/* En-tête */}

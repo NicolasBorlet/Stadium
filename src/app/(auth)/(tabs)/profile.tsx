@@ -1,12 +1,11 @@
 import { Button, Screen, Text } from "@/components"
 import { useAuth } from "@/contexts/AuthContext"
-import { useFriendRequests, useFriends, useUserBadges, useUserMatches } from "@/hooks/useFirestore"
+import { useFriendRequests, useFriends, useUserBadges } from "@/hooks/useFirestore"
 import { BadgeData, FriendData } from "@/services/firestore"
 import { spacing, ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { observer } from "mobx-react-lite"
-import { useMemo } from "react"
-import { Image, ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native"
+import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 
 export default observer(function ProfileScreen() {
   const { themed } = useAppTheme()
@@ -14,139 +13,93 @@ export default observer(function ProfileScreen() {
   const { data: badges } = useUserBadges()
   const { data: friends } = useFriends()
   const { data: friendRequests } = useFriendRequests()
-  const { data: matches } = useUserMatches()
-
-  const stats = useMemo(() => {
-    if (!matches) return null
-
-    // Calculer le stade le plus visité
-    const stadiumCounts = matches.reduce(
-      (acc, match) => {
-        const stadiumName = match.stadium.name
-        acc[stadiumName] = (acc[stadiumName] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-    const mostVisitedStadium = Object.entries(stadiumCounts).reduce((a, b) => (a[1] > b[1] ? a : b))
-
-    // Calculer l'équipe la plus vue
-    const teamCounts = matches.reduce(
-      (acc, match) => {
-        const homeTeamName = match.homeTeam.name
-        const awayTeamName = match.awayTeam.name
-        acc[homeTeamName] = (acc[homeTeamName] || 0) + 1
-        acc[awayTeamName] = (acc[awayTeamName] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-    const mostWatchedTeam = Object.entries(teamCounts).reduce((a, b) => (a[1] > b[1] ? a : b))
-
-    return {
-      mostVisitedStadium: {
-        name: mostVisitedStadium[0],
-        count: mostVisitedStadium[1],
-      },
-      mostWatchedTeam: {
-        name: mostWatchedTeam[0],
-        count: mostWatchedTeam[1],
-      },
-    }
-  }, [matches])
 
   const handleSignOut = async () => {
     await signOut()
   }
 
   return (
-    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)}>
-      <ScrollView style={themed($content)}>
-        <View style={themed($profileHeader)}>
-          <View style={themed($avatarContainer)}>
-            <Image
-              source={require("../../../../assets/images/welcome-face.png")}
-              style={themed($avatar)}
-            />
-          </View>
-          <Text text={user?.name || "Utilisateur"} preset="heading" />
-          <Text text={`Membre depuis ${user?.memberSince || "2024"}`} preset="default" />
+    <Screen
+      safeAreaEdges={["top"]}
+      contentContainerStyle={[themed($container), { padding: spacing.lg }]}
+      preset="scroll"
+    >
+      <View style={themed($profileHeader)}>
+        <View style={themed($avatarContainer)}>
+          <Image
+            source={require("../../../../assets/images/welcome-face.png")}
+            style={themed($avatar)}
+          />
         </View>
+        <Text text={user?.name || "Utilisateur"} preset="heading" />
+        <Text text={`Membre depuis ${user?.memberSince || "2024"}`} preset="default" />
+      </View>
 
-        <View style={themed($profileInfo)}>
-          <View style={themed($infoItem)}>
-            <Text text="Email" preset="default" />
-            <Text text={user?.email || "user@example.com"} preset="default" />
-          </View>
-          <View style={themed($infoItem)}>
-            <Text text="Pays" preset="default" />
-            <Text text={user?.country || "France"} preset="default" />
-          </View>
+      <View
+        style={{
+          marginBottom: spacing.xl,
+        }}
+      >
+        <Text text="Code ami" preset="subheading" style={themed($sectionTitleText)} />
+        <View style={themed($friendCodeContainer)}>
+          <Text text={user?.id || "Aucun"} preset="default" />
         </View>
+      </View>
 
-        {/* Statistiques */}
-        <View style={themed($section)}>
-          <Text text="Statistiques" preset="subheading" style={themed($sectionTitleText)} />
-          <View style={themed($statsContainer)}>
-            <View style={themed($statItem)}>
-              <Text text="Stade le plus visité" preset="default" />
-              <Text text={stats?.mostVisitedStadium.name || "Aucun"} preset="default" />
-              <Text text={`${stats?.mostVisitedStadium.count || 0} visites`} preset="default" />
+      <View style={themed($profileInfo)}>
+        <View style={themed($infoItem)}>
+          <Text text="Email" preset="default" />
+          <Text text={user?.email || "user@example.com"} preset="default" />
+        </View>
+        <View style={themed($infoItem)}>
+          <Text text="Pays" preset="default" />
+          <Text text={user?.country || "France"} preset="default" />
+        </View>
+      </View>
+
+      {/* Badges */}
+      <View style={themed($section)}>
+        <Text text="Badges" preset="subheading" style={themed($sectionTitleText)} />
+        <View style={themed($badgesContainer)}>
+          {badges?.map((badge: BadgeData) => (
+            <View key={badge.id} style={themed($badgeItem)}>
+              <Image source={{ uri: badge.image }} style={themed($badgeImage)} />
+              <Text text={badge.name} preset="default" />
+              <Text text={badge.description} preset="default" />
             </View>
-            <View style={themed($statItem)}>
-              <Text text="Équipe la plus vue" preset="default" />
-              <Text text={stats?.mostWatchedTeam.name || "Aucune"} preset="default" />
-              <Text text={`${stats?.mostWatchedTeam.count || 0} matchs`} preset="default" />
-            </View>
-          </View>
+          ))}
         </View>
+      </View>
 
-        {/* Badges */}
+      {/* Amis */}
+      <View style={themed($section)}>
+        <Text text="Amis" preset="subheading" style={themed($sectionTitleText)} />
+        <View style={themed($friendsContainer)}>
+          {friends?.map((friend: FriendData) => (
+            <View key={friend.id} style={themed($friendItem)}>
+              <Text text={friend.friendId} preset="default" />
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Demandes d'amis */}
+      {friendRequests && friendRequests.length > 0 && (
         <View style={themed($section)}>
-          <Text text="Badges" preset="subheading" style={themed($sectionTitleText)} />
-          <View style={themed($badgesContainer)}>
-            {badges?.map((badge: BadgeData) => (
-              <View key={badge.id} style={themed($badgeItem)}>
-                <Image source={{ uri: badge.image }} style={themed($badgeImage)} />
-                <Text text={badge.name} preset="default" />
-                <Text text={badge.description} preset="default" />
+          <Text text="Demandes d'amis" preset="subheading" style={themed($sectionTitleText)} />
+          <View style={themed($friendRequestsContainer)}>
+            {friendRequests.map((request: FriendData) => (
+              <View key={request.id} style={themed($friendRequestItem)}>
+                <Text text={request.friendId} preset="default" />
               </View>
             ))}
           </View>
         </View>
+      )}
 
-        {/* Amis */}
-        <View style={themed($section)}>
-          <Text text="Amis" preset="subheading" style={themed($sectionTitleText)} />
-          <View style={themed($friendsContainer)}>
-            {friends?.map((friend: FriendData) => (
-              <View key={friend.id} style={themed($friendItem)}>
-                <Text text={friend.friendId} preset="default" />
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Demandes d'amis */}
-        {friendRequests && friendRequests.length > 0 && (
-          <View style={themed($section)}>
-            <Text text="Demandes d'amis" preset="subheading" style={themed($sectionTitleText)} />
-            <View style={themed($friendRequestsContainer)}>
-              {friendRequests.map((request: FriendData) => (
-                <View key={request.id} style={themed($friendRequestItem)}>
-                  <Text text={request.friendId} preset="default" />
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        <View style={themed($actions)}>
-          <Button text="Se déconnecter" onPress={handleSignOut} />
-        </View>
-      </ScrollView>
+      <View style={themed($actions)}>
+        <Button text="Se déconnecter" onPress={handleSignOut} />
+      </View>
     </Screen>
   )
 })
@@ -199,16 +152,6 @@ const $sectionTitleText: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
 })
 
-const $statsContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  gap: spacing.md,
-})
-
-const $statItem: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  padding: spacing.md,
-  borderRadius: 8,
-  backgroundColor: "rgba(0,0,0,0.05)",
-})
-
 const $badgesContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   flexWrap: "wrap",
@@ -250,4 +193,11 @@ const $friendRequestItem: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 const $actions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginTop: spacing.xl,
   paddingTop: spacing.xl,
+})
+
+const $friendCodeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  padding: spacing.md,
+  borderRadius: 8,
+  backgroundColor: "rgba(0,0,0,0.05)",
+  alignItems: "center",
 })

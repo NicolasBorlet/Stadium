@@ -93,7 +93,7 @@ export default function AddStadium() {
   }, [])
 
   return (
-    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)}>
+    <Screen contentContainerStyle={themed($container)}>
       <Header title="Ajouter un stade" />
       <View style={themed($content)}>
         <View style={themed($searchContainer)}>
