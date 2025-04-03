@@ -121,7 +121,7 @@ export default observer(function ProfileScreen() {
           <View style={themed($friendRequestsContainer)}>
             {friendRequests.map((request: FriendData) => (
               <View key={request.id} style={themed($friendRequestItem)}>
-                <Text text={request.friendId} preset="default" />
+                <Text text={request.name} preset="default" />
                 <View style={themed($friendRequestActions)}>
                   <Button
                     text="Accepter"

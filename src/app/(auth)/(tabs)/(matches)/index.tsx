@@ -87,7 +87,7 @@ export default function MatchesScreen() {
   }
 
   return (
-    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)}>
+    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)} preset="scroll">
       <View style={themed($content)}>
         <View
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
@@ -99,6 +99,8 @@ export default function MatchesScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <MatchItem item={item} />}
           contentContainerStyle={{ paddingVertical: 16 }}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </Screen>

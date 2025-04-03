@@ -76,7 +76,7 @@ export default function StadiaScreen() {
   }
 
   return (
-    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)}>
+    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)} preset="scroll">
       <View style={themed($content)}>
         <View
           style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
@@ -88,6 +88,8 @@ export default function StadiaScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <StadiumItem item={item} />}
           contentContainerStyle={{ paddingVertical: 16 }}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </Screen>
