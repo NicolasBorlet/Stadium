@@ -97,7 +97,6 @@ export default function StadiaScreen() {
 }
 
 const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  flex: 1,
   backgroundColor: colors.background,
 })
 

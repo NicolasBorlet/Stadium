@@ -140,7 +140,7 @@ export default function AddMatch() {
 
   return (
     <Screen preset="scroll">
-      <Header title="Ajouter un match" />
+      <Header title="Ajouter un match" leftIcon="back" onLeftPress={() => router.back()} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 162 }}>
         <View style={{ gap: 16 }}>
           <Card

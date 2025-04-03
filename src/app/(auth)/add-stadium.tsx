@@ -94,7 +94,7 @@ export default function AddStadium() {
 
   return (
     <Screen contentContainerStyle={themed($container)}>
-      <Header title="Ajouter un stade" />
+      <Header title="Ajouter un stade" leftIcon="back" onLeftPress={() => router.back()} />
       <View style={themed($content)}>
         <View style={themed($searchContainer)}>
           <View style={themed($searchIconContainer)}>
