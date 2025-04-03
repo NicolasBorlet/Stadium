@@ -20,6 +20,7 @@ export default observer(function SignUpScreen() {
     setIsLoading(true)
     try {
       await signUp(email, password, name, country)
+      router.replace("/(tabs)")
     } catch (error) {
       console.error(error)
     } finally {
@@ -52,11 +53,11 @@ export default observer(function SignUpScreen() {
             onChangeText={setCountry}
             autoCapitalize="words"
           />
-          <Button text="S'inscrire" onPress={handleSignUp} loading={isLoading} />
+          <Button text="S'inscrire" onPress={handleSignUp} disabled={isLoading} />
           <Button
             text="Déjà un compte ? Se connecter"
             onPress={() => router.push("/sign-in")}
-            preset="secondary"
+            preset="default"
           />
         </View>
       </View>

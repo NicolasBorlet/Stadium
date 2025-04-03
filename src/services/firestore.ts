@@ -21,6 +21,8 @@ export interface UserData {
   name: string
   country: string
   memberSince: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface StadiumData {
@@ -84,6 +86,7 @@ export interface FriendData {
   id: string
   userId: string
   friendId: string
+  name: string
   status: "pending" | "accepted" | "rejected"
   createdAt: Date
   updatedAt: Date
@@ -103,14 +106,17 @@ export interface UserStats {
 }
 
 export const userService = {
-  async createUser(data: Omit<UserData, "id">) {
+  async createUser(data: Omit<UserData, "id" | "createdAt" | "updatedAt">) {
     const userId = auth.currentUser?.uid
     if (!userId) throw new Error("No authenticated user")
 
+    const now = new Date()
     const userData: UserData = {
       id: userId,
       ...data,
-      memberSince: new Date(),
+      memberSince: now,
+      createdAt: now,
+      updatedAt: now,
     }
 
     await setDoc(doc(db, "users", userId), userData)
@@ -124,9 +130,10 @@ export const userService = {
   },
 
   async updateUser(userId: string, data: Partial<UserData>) {
+    const now = new Date()
     await updateDoc(doc(db, "users", userId), {
       ...data,
-      updatedAt: new Date(),
+      updatedAt: now,
     })
   },
 }
@@ -309,11 +316,18 @@ export const friendService = {
   },
 
   async sendFriendRequest(userId: string, friendId: string) {
-    const friendRef = doc(collection(db, "users", userId, "friends"))
+    const userDoc = await getDoc(doc(db, "users", userId))
+    if (!userDoc.exists) {
+      throw new Error("Utilisateur non trouvé")
+    }
+    const userData = userDoc.data() as UserData
+
+    const friendRef = doc(db, "users", friendId, "friends", userId)
     const friendData: FriendData = {
-      id: friendRef.id,
-      userId,
-      friendId,
+      id: userId,
+      userId: userId,
+      friendId: friendId,
+      name: userData.name,
       status: "pending",
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -323,20 +337,84 @@ export const friendService = {
   },
 
   async acceptFriendRequest(userId: string, requestId: string) {
-    await updateDoc(doc(db, "users", userId, "friends", requestId), {
+    const requestRef = doc(db, "users", userId, "friends", requestId)
+    const requestSnap = await getDoc(requestRef)
+
+    if (!requestSnap.exists) {
+      throw new Error("Demande d'ami non trouvée")
+    }
+
+    const requestData = requestSnap.data() as FriendData
+    const senderId = requestData.userId
+
+    const userDoc = await getDoc(doc(db, "users", userId))
+    if (!userDoc.exists) {
+      throw new Error("Utilisateur non trouvé")
+    }
+    const userData = userDoc.data() as UserData
+
+    await updateDoc(requestRef, {
       status: "accepted",
       updatedAt: new Date(),
     })
+
+    const friendRef = doc(db, "users", senderId, "friends", userId)
+    const friendData: FriendData = {
+      id: userId,
+      userId: senderId,
+      friendId: userId,
+      name: userData.name,
+      status: "accepted",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    await setDoc(friendRef, friendData)
   },
 
   async rejectFriendRequest(userId: string, requestId: string) {
-    await updateDoc(doc(db, "users", userId, "friends", requestId), {
+    const requestRef = doc(db, "users", userId, "friends", requestId)
+    const requestSnap = await getDoc(requestRef)
+
+    if (!requestSnap.exists) {
+      throw new Error("Demande d'ami non trouvée")
+    }
+
+    const requestData = requestSnap.data() as FriendData
+    const senderId = requestData.userId
+
+    const userDoc = await getDoc(doc(db, "users", userId))
+    if (!userDoc.exists) {
+      throw new Error("Utilisateur non trouvé")
+    }
+    const userData = userDoc.data() as UserData
+
+    await updateDoc(requestRef, {
       status: "rejected",
       updatedAt: new Date(),
     })
+
+    const friendRef = doc(db, "users", senderId, "friends", userId)
+    const friendData: FriendData = {
+      id: userId,
+      userId: senderId,
+      friendId: userId,
+      name: userData.name,
+      status: "rejected",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    await setDoc(friendRef, friendData)
   },
 
   async removeFriend(userId: string, friendId: string) {
     await deleteDoc(doc(db, "users", userId, "friends", friendId))
+
+    const q = query(collection(db, "users", friendId, "friends"), where("friendId", "==", userId))
+    const snapshot = await getDocs(q)
+
+    if (!snapshot.empty) {
+      const docToDelete = snapshot.docs[0]
+      await deleteDoc(doc(db, "users", friendId, "friends", docToDelete.id))
+    }
   },
 }

@@ -12,7 +12,7 @@ export default observer(function StatsScreen() {
   const { data: matches } = useUserMatches()
 
   const calculatedStats = useMemo(() => {
-    if (!matches) return null
+    if (!matches || matches.length === 0) return null
 
     // Calculer le stade le plus visité
     const stadiumCounts = matches.reduce(
@@ -54,7 +54,7 @@ export default observer(function StatsScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={themed($loadingContainer)}>
         <Text>Chargement...</Text>
       </View>
     )
@@ -62,9 +62,26 @@ export default observer(function StatsScreen() {
 
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={themed($loadingContainer)}>
         <Text>Une erreur est survenue</Text>
       </View>
+    )
+  }
+
+  if (!matches || matches.length === 0) {
+    return (
+      <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)} preset="scroll">
+        <View style={themed($content)}>
+          <Text text="Statistiques" preset="heading" />
+          <View style={themed($emptyStateContainer)}>
+            <Text text="Vous n'avez pas encore de matchs enregistrés" preset="default" />
+            <Text
+              text="Commencez à ajouter des matchs pour voir vos statistiques"
+              preset="default"
+            />
+          </View>
+        </View>
+      </Screen>
     )
   }
 
@@ -148,4 +165,18 @@ const $calculatedStatItem: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.md,
   borderRadius: 8,
   backgroundColor: "rgba(0,0,0,0.05)",
+})
+
+const $loadingContainer: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $emptyStateContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  gap: spacing.md,
+  marginTop: spacing.xl,
 })

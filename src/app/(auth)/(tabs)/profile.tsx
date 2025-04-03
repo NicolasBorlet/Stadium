@@ -1,11 +1,19 @@
 import { Button, Screen, Text } from "@/components"
 import { useAuth } from "@/contexts/AuthContext"
-import { useFriendRequests, useFriends, useUserBadges } from "@/hooks/useFirestore"
+import {
+  useAcceptFriendRequest,
+  useFriendRequests,
+  useFriends,
+  useRejectFriendRequest,
+  useSendFriendRequest,
+  useUserBadges,
+} from "@/hooks/useFirestore"
 import { BadgeData, FriendData } from "@/services/firestore"
 import { spacing, ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { observer } from "mobx-react-lite"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { useState } from "react"
+import { Image, ImageStyle, Modal, TextInput, TextStyle, View, ViewStyle } from "react-native"
 
 export default observer(function ProfileScreen() {
   const { themed } = useAppTheme()
@@ -13,17 +21,35 @@ export default observer(function ProfileScreen() {
   const { data: badges } = useUserBadges()
   const { data: friends } = useFriends()
   const { data: friendRequests } = useFriendRequests()
+  const sendFriendRequest = useSendFriendRequest()
+  const acceptFriendRequest = useAcceptFriendRequest()
+  const rejectFriendRequest = useRejectFriendRequest()
+
+  const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false)
+  const [friendCode, setFriendCode] = useState("")
 
   const handleSignOut = async () => {
     await signOut()
   }
 
+  const handleAddFriend = async () => {
+    if (friendCode.trim()) {
+      await sendFriendRequest.mutateAsync(friendCode.trim())
+      setFriendCode("")
+      setIsAddFriendModalVisible(false)
+    }
+  }
+
+  const handleAcceptRequest = async (requestId: string) => {
+    await acceptFriendRequest.mutateAsync(requestId)
+  }
+
+  const handleRejectRequest = async (requestId: string) => {
+    await rejectFriendRequest.mutateAsync(requestId)
+  }
+
   return (
-    <Screen
-      safeAreaEdges={["top"]}
-      contentContainerStyle={[themed($container), { padding: spacing.lg }]}
-      preset="scroll"
-    >
+    <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)} preset="scroll">
       <View style={themed($profileHeader)}>
         <View style={themed($avatarContainer)}>
           <Image
@@ -44,6 +70,11 @@ export default observer(function ProfileScreen() {
         <View style={themed($friendCodeContainer)}>
           <Text text={user?.id || "Aucun"} preset="default" />
         </View>
+        <Button
+          text="Ajouter un ami"
+          onPress={() => setIsAddFriendModalVisible(true)}
+          style={{ marginTop: spacing.md }}
+        />
       </View>
 
       <View style={themed($profileInfo)}>
@@ -77,7 +108,7 @@ export default observer(function ProfileScreen() {
         <View style={themed($friendsContainer)}>
           {friends?.map((friend: FriendData) => (
             <View key={friend.id} style={themed($friendItem)}>
-              <Text text={friend.friendId} preset="default" />
+              <Text text={friend.name} preset="default" />
             </View>
           ))}
         </View>
@@ -91,6 +122,14 @@ export default observer(function ProfileScreen() {
             {friendRequests.map((request: FriendData) => (
               <View key={request.id} style={themed($friendRequestItem)}>
                 <Text text={request.friendId} preset="default" />
+                <View style={themed($friendRequestActions)}>
+                  <Button
+                    text="Accepter"
+                    onPress={() => handleAcceptRequest(request.id)}
+                    style={{ marginRight: spacing.sm }}
+                  />
+                  <Button text="Refuser" onPress={() => handleRejectRequest(request.id)} />
+                </View>
               </View>
             ))}
           </View>
@@ -100,17 +139,41 @@ export default observer(function ProfileScreen() {
       <View style={themed($actions)}>
         <Button text="Se déconnecter" onPress={handleSignOut} />
       </View>
+
+      {/* Modal d'ajout d'ami */}
+      <Modal
+        visible={isAddFriendModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsAddFriendModalVisible(false)}
+      >
+        <View style={themed($modalOverlay)}>
+          <View style={themed($modalContent)}>
+            <Text text="Ajouter un ami" preset="heading" style={{ marginBottom: spacing.lg }} />
+            <TextInput
+              style={themed($input)}
+              placeholder="Entrez le code ami"
+              value={friendCode}
+              onChangeText={setFriendCode}
+              autoCapitalize="none"
+            />
+            <View style={themed($modalActions)}>
+              <Button
+                text="Annuler"
+                onPress={() => setIsAddFriendModalVisible(false)}
+                style={{ marginRight: spacing.sm }}
+              />
+              <Button text="Ajouter" onPress={handleAddFriend} />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Screen>
   )
 })
 
 const $container: ThemedStyle<ViewStyle> = ({ colors }) => ({
-  flex: 1,
   backgroundColor: colors.background,
-})
-
-const $content: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flex: 1,
   padding: spacing.lg,
 })
 
@@ -200,4 +263,37 @@ const $friendCodeContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   borderRadius: 8,
   backgroundColor: "rgba(0,0,0,0.05)",
   alignItems: "center",
+})
+
+const $friendRequestActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  marginTop: spacing.md,
+})
+
+const $modalOverlay: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+const $modalContent: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.background,
+  padding: spacing.lg,
+  borderRadius: 12,
+  width: "80%",
+})
+
+const $modalActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  marginTop: spacing.lg,
+})
+
+const $input: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  borderWidth: 1,
+  borderColor: colors.border,
+  borderRadius: 8,
+  padding: spacing.sm,
+  marginBottom: spacing.md,
 })
