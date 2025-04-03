@@ -5,6 +5,7 @@ import {
   MatchData,
   matchService,
   publicStadiumService,
+  rankingService,
   StadiumData,
   stadiumService,
   teamService,
@@ -293,5 +294,24 @@ export function useRemoveFriend() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends", "user", user?.id] })
     },
+  })
+}
+
+// Hooks pour le classement
+export function useTopRankings() {
+  return useQuery({
+    queryKey: ["topRankings"],
+    queryFn: () => rankingService.getTopRankings(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export function useUserRanking() {
+  const { user } = useAuth()
+  return useQuery({
+    queryKey: ["userRanking", user?.id],
+    queryFn: () => rankingService.getUserRanking(user!.id),
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }

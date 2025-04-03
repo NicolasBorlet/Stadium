@@ -1,5 +1,5 @@
 import { Screen, Text } from "@/components"
-import { useUserMatches, useUserStats } from "@/hooks/useFirestore"
+import { useTopRankings, useUserMatches, useUserRanking, useUserStats } from "@/hooks/useFirestore"
 import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { observer } from "mobx-react-lite"
@@ -10,6 +10,8 @@ export default observer(function StatsScreen() {
   const { data: stats, isLoading, error } = useUserStats()
   const { themed } = useAppTheme()
   const { data: matches } = useUserMatches()
+  const { data: topRankings } = useTopRankings()
+  const { data: userRanking } = useUserRanking()
 
   const calculatedStats = useMemo(() => {
     if (!matches || matches.length === 0) return null
@@ -85,6 +87,9 @@ export default observer(function StatsScreen() {
     )
   }
 
+  const showUserRanking =
+    userRanking && (!topRankings || !topRankings.some((r) => r.id === userRanking.id))
+
   return (
     <Screen safeAreaEdges={["top"]} contentContainerStyle={themed($container)} preset="scroll">
       <View style={themed($content)}>
@@ -121,6 +126,25 @@ export default observer(function StatsScreen() {
                 preset="default"
               />
             </View>
+          </View>
+        </View>
+        <View style={themed($section)}>
+          <Text text="Classement" preset="heading" style={themed($sectionTitleText)} />
+          <View style={themed($rankingContainer)}>
+            {topRankings?.map((ranking, index) => (
+              <View key={ranking.id} style={themed($rankingItem)}>
+                <Text text={`#${index + 1}`} preset="default" />
+                <Text text={ranking.name || "Anonyme"} preset="default" />
+                <Text text={ranking.points.toString()} preset="default" />
+              </View>
+            ))}
+            {showUserRanking && (
+              <View style={themed([$rankingItem, $userRankingItem])}>
+                <Text text={`#${userRanking.rank || "?"}`} preset="default" />
+                <Text text={userRanking.name || "Vous"} preset="default" />
+                <Text text={userRanking.points.toString()} preset="default" />
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -179,4 +203,23 @@ const $emptyStateContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",
   gap: spacing.md,
   marginTop: spacing.xl,
+})
+
+const $rankingContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  gap: spacing.sm,
+})
+
+const $rankingItem: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: spacing.md,
+  borderRadius: 8,
+  backgroundColor: "rgba(0,0,0,0.05)",
+})
+
+const $userRankingItem: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: colors.palette.primary100,
+  borderWidth: 1,
+  borderColor: colors.palette.primary500,
 })

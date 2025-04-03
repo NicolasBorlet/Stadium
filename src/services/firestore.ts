@@ -105,6 +105,13 @@ export interface UserStats {
   }
 }
 
+export interface RankingData {
+  id: string
+  name: string
+  points: number
+  rank?: number
+}
+
 export const userService = {
   async createUser(data: Omit<UserData, "id" | "createdAt" | "updatedAt">) {
     const userId = auth.currentUser?.uid
@@ -416,5 +423,25 @@ export const friendService = {
       const docToDelete = snapshot.docs[0]
       await deleteDoc(doc(db, "users", friendId, "friends", docToDelete.id))
     }
+  },
+}
+
+export const rankingService = {
+  async getTopRankings() {
+    const q = query(collection(db, "ranking"), orderBy("points", "desc"), limit(5))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as RankingData[]
+  },
+
+  async getUserRanking(userId: string) {
+    const docSnap = await getDoc(doc(db, "ranking", userId))
+    if (!docSnap.exists) return null
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as RankingData
   },
 }
